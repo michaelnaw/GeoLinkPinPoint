@@ -156,8 +156,8 @@ class MainViewModel(
                         m.pointBLatitude.toString(),
                         m.pointBLongitude.toString(),
                         escapeCsv(m.pointBLabel ?: ""),
-                        "%.2f".format(m.distanceMeters),
-                        "%.2f".format(m.bearingDegrees),
+                        String.format(Locale.US, "%.2f", m.distanceMeters),
+                        String.format(Locale.US, "%.2f", m.bearingDegrees),
                         dateFormat.format(Date(m.timestamp))
                     )
                     writer.write(fields.joinToString(","))
