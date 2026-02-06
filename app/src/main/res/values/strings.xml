@@ -31,6 +31,8 @@
     <string name="coord_format">%.6f, %.6f</string>
 
     <!-- CoordinateInput -->
+    <string name="plus_minus">\u00B1</string>
+    <string name="toggle_sign">Toggle sign</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="set_point">Set %s</string>

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -42,6 +44,16 @@ fun CoordinateInput(
                 value = latText,
                 onValueChange = { latText = it },
                 label = { Text(stringResource(R.string.latitude)) },
+                leadingIcon = {
+                    IconButton(onClick = {
+                        latText = if (latText.startsWith("-")) latText.removePrefix("-") else "-$latText"
+                    }) {
+                        Text(
+                            text = stringResource(R.string.plus_minus),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true,
                 modifier = Modifier.weight(1f)
@@ -50,6 +62,16 @@ fun CoordinateInput(
                 value = lngText,
                 onValueChange = { lngText = it },
                 label = { Text(stringResource(R.string.longitude)) },
+                leadingIcon = {
+                    IconButton(onClick = {
+                        lngText = if (lngText.startsWith("-")) lngText.removePrefix("-") else "-$lngText"
+                    }) {
+                        Text(
+                            text = stringResource(R.string.plus_minus),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true,
                 modifier = Modifier.weight(1f)
