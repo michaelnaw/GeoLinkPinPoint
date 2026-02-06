@@ -85,7 +85,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
     // Serialization (for type-safe navigation routes)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 
