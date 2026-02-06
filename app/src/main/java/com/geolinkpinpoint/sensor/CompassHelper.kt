@@ -26,14 +26,20 @@ class CompassHelper(context: Context) : SensorEventListener {
     private var gravity: FloatArray? = null
     private var geomagnetic: FloatArray? = null
     private var currentAzimuth = 0f
+    private var lastEmitTimeNanos = 0L
 
     private val alpha = 0.15f
+
+    private companion object {
+        const val THROTTLE_INTERVAL_NS = 50_000_000L // 50ms
+    }
 
     val isAvailable: Boolean
         get() = accelerometer != null && magnetometer != null
 
     fun start() {
         if (accelerometer != null && magnetometer != null) {
+            lastEmitTimeNanos = 0L
             sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI)
             sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI)
             _compassState.value = _compassState.value.copy(isAvailable = true)
@@ -61,7 +67,12 @@ class CompassHelper(context: Context) : SensorEventListener {
             SensorManager.getOrientation(rotationMatrix, orientation)
             val azimuthDegrees = ((Math.toDegrees(orientation[0].toDouble()).toFloat()) + 360) % 360
             currentAzimuth = azimuthDegrees
-            _compassState.value = CompassState(azimuth = currentAzimuth, isAvailable = true)
+
+            val now = System.nanoTime()
+            if (now - lastEmitTimeNanos >= THROTTLE_INTERVAL_NS) {
+                lastEmitTimeNanos = now
+                _compassState.value = CompassState(azimuth = currentAzimuth, isAvailable = true)
+            }
         }
     }
 

@@ -3,6 +3,9 @@ package com.geolinkpinpoint.location
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Looper
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -21,13 +24,16 @@ data class LocationState(
     val hasLocation: Boolean = false
 )
 
-class LocationHelper(context: Context) {
+class LocationHelper(context: Context) : DefaultLifecycleObserver {
 
     private val fusedClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
 
     private val _locationState = MutableStateFlow(LocationState())
     val locationState: StateFlow<LocationState> = _locationState.asStateFlow()
+
+    private var updatesRequested = false
+    private var boundLifecycle: Lifecycle? = null
 
     private val locationRequest = LocationRequest.Builder(
         Priority.PRIORITY_HIGH_ACCURACY, 1000L
@@ -49,6 +55,7 @@ class LocationHelper(context: Context) {
 
     @SuppressLint("MissingPermission")
     fun startUpdates() {
+        updatesRequested = true
         fusedClient.requestLocationUpdates(
             locationRequest,
             locationCallback,
@@ -57,6 +64,31 @@ class LocationHelper(context: Context) {
     }
 
     fun stopUpdates() {
+        updatesRequested = false
         fusedClient.removeLocationUpdates(locationCallback)
+    }
+
+    fun bindToLifecycle(lifecycle: Lifecycle) {
+        if (boundLifecycle === lifecycle) return
+        boundLifecycle?.removeObserver(this)
+        boundLifecycle = lifecycle
+        lifecycle.addObserver(this)
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onResume(owner: LifecycleOwner) {
+        if (updatesRequested) {
+            fusedClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+        }
+    }
+
+    override fun onPause(owner: LifecycleOwner) {
+        if (updatesRequested) {
+            fusedClient.removeLocationUpdates(locationCallback)
+        }
     }
 }

@@ -26,6 +26,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.geolinkpinpoint.R
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -60,16 +62,16 @@ fun AppNavigation(viewModel: MainViewModel) {
     val exportScope = rememberCoroutineScope()
 
     val bottomNavItems = listOf(
-        BottomNavItem("Measure", Icons.Default.Straighten, MeasureRoute),
-        BottomNavItem("GPS/Compass", Icons.Default.Explore, GpsCompassRoute),
-        BottomNavItem("History", Icons.Default.History, HistoryRoute)
+        BottomNavItem(stringResource(R.string.tab_measure), Icons.Default.Straighten, MeasureRoute),
+        BottomNavItem(stringResource(R.string.tab_gps_compass), Icons.Default.Explore, GpsCompassRoute),
+        BottomNavItem(stringResource(R.string.tab_history), Icons.Default.History, HistoryRoute)
     )
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("GeoLinkPinPoint") },
+                title = { Text(stringResource(R.string.app_name)) },
                 actions = {
                     if (currentDestination?.hasRoute(HistoryRoute::class) == true) {
                         IconButton(onClick = {
@@ -81,16 +83,18 @@ fun AppNavigation(viewModel: MainViewModel) {
                                         putExtra(Intent.EXTRA_STREAM, uri)
                                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                     }
-                                    context.startActivity(Intent.createChooser(intent, "Export Measurements"))
+                                    context.startActivity(Intent.createChooser(intent, context.getString(R.string.export_measurements)))
+                                } else {
+                                    snackbarHostState.showSnackbar(context.getString(R.string.export_failed))
                                 }
                             }
                         }) {
-                            Icon(Icons.Default.Share, contentDescription = "Export CSV")
+                            Icon(Icons.Default.Share, contentDescription = stringResource(R.string.action_export_csv))
                         }
                     }
                     if (measureState.pointA != null || measureState.pointB != null) {
                         IconButton(onClick = { viewModel.clearPoints() }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Clear Points")
+                            Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.action_clear_points))
                         }
                     }
                 }
@@ -124,10 +128,10 @@ fun AppNavigation(viewModel: MainViewModel) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<MeasureRoute> {
-                MeasureScreen(viewModel = viewModel)
+                MeasureScreen(viewModel = viewModel, snackbarHostState = snackbarHostState)
             }
             composable<GpsCompassRoute> {
-                GpsCompassScreen(viewModel = viewModel)
+                GpsCompassScreen(viewModel = viewModel, snackbarHostState = snackbarHostState)
             }
             composable<HistoryRoute> {
                 HistoryScreen(

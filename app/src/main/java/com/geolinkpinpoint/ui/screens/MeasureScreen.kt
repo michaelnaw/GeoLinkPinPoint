@@ -31,6 +31,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,34 +39,46 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.SnackbarHostState
+import com.geolinkpinpoint.R
 import com.geolinkpinpoint.ui.MainViewModel
 import com.geolinkpinpoint.ui.components.CoordinateInput
 import com.geolinkpinpoint.ui.components.PointCard
 import com.geolinkpinpoint.util.GeoCalculations
 import com.geolinkpinpoint.util.GeoPoint
+import kotlinx.coroutines.launch
 
 @Composable
-fun MeasureScreen(viewModel: MainViewModel) {
+fun MeasureScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostState) {
     val state by viewModel.measureState.collectAsState()
     val locationState by viewModel.locationState.collectAsState()
     var showManualInput by remember { mutableStateOf(false) }
     var showSaveDialog by remember { mutableStateOf(false) }
     var tagText by remember { mutableStateOf("") }
     var pendingLocationTarget by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    val currentLocationLabel = stringResource(R.string.current_location)
+    val permissionDeniedMsg = stringResource(R.string.location_permission_required)
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions.values.any { it }) {
             viewModel.startLocationUpdates()
+        } else {
+            pendingLocationTarget = null
+            scope.launch {
+                snackbarHostState.showSnackbar(permissionDeniedMsg)
+            }
         }
     }
 
     LaunchedEffect(locationState.hasLocation, pendingLocationTarget) {
         if (locationState.hasLocation && pendingLocationTarget != null) {
-            val point = GeoPoint(locationState.latitude, locationState.longitude, "Current Location")
+            val point = GeoPoint(locationState.latitude, locationState.longitude, currentLocationLabel)
             when (pendingLocationTarget) {
                 "A" -> viewModel.setPointA(point)
                 "B" -> viewModel.setPointB(point)
@@ -84,6 +97,23 @@ fun MeasureScreen(viewModel: MainViewModel) {
         PointCard(label = "A", point = state.pointA)
         PointCard(label = "B", point = state.pointB)
 
+        // Instruction card for first-time users
+        if (state.pointA == null && state.pointB == null) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.instruction_share_location),
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+        }
+
         // Result card
         if (state.distanceMeters != null && state.bearingDegrees != null) {
             Card(
@@ -94,17 +124,17 @@ fun MeasureScreen(viewModel: MainViewModel) {
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Result",
+                        text = stringResource(R.string.result_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Distance: ${GeoCalculations.formatDistance(state.distanceMeters!!)}",
+                        text = stringResource(R.string.distance_value, GeoCalculations.formatDistance(state.distanceMeters!!)),
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Text(
-                        text = "Bearing: %.1f\u00B0 %s".format(
+                        text = stringResource(R.string.bearing_value).format(
                             state.bearingDegrees!!,
                             GeoCalculations.cardinalDirection(state.bearingDegrees!!)
                         ),
@@ -124,8 +154,8 @@ fun MeasureScreen(viewModel: MainViewModel) {
                     onClick = { viewModel.swapPoints() },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Icon(Icons.Default.SwapVert, contentDescription = "Swap")
-                    Text(" Swap")
+                    Icon(Icons.Default.SwapVert, contentDescription = stringResource(R.string.action_swap))
+                    Text(" ${stringResource(R.string.action_swap)}")
                 }
             }
             if (state.distanceMeters != null) {
@@ -133,8 +163,8 @@ fun MeasureScreen(viewModel: MainViewModel) {
                     onClick = { showSaveDialog = true },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Icon(Icons.Default.Save, contentDescription = "Save")
-                    Text(" Save")
+                    Icon(Icons.Default.Save, contentDescription = stringResource(R.string.action_save))
+                    Text(" ${stringResource(R.string.action_save)}")
                 }
             }
         }
@@ -143,19 +173,19 @@ fun MeasureScreen(viewModel: MainViewModel) {
         TextButton(onClick = { showManualInput = !showManualInput }) {
             Icon(
                 if (showManualInput) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                contentDescription = "Toggle manual input"
+                contentDescription = stringResource(R.string.toggle_manual_input)
             )
-            Text(" Manual Input")
+            Text(" ${stringResource(R.string.manual_input)}")
         }
 
         AnimatedVisibility(visible = showManualInput) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 CoordinateInput(
-                    label = "Point A",
+                    label = stringResource(R.string.point_a),
                     onSubmit = { lat, lng -> viewModel.setPointA(GeoPoint(lat, lng)) },
                     onUseCurrentLocation = {
                         if (locationState.hasLocation) {
-                            viewModel.setPointA(GeoPoint(locationState.latitude, locationState.longitude, "Current Location"))
+                            viewModel.setPointA(GeoPoint(locationState.latitude, locationState.longitude, currentLocationLabel))
                         } else {
                             pendingLocationTarget = "A"
                             permissionLauncher.launch(arrayOf(
@@ -166,11 +196,11 @@ fun MeasureScreen(viewModel: MainViewModel) {
                     }
                 )
                 CoordinateInput(
-                    label = "Point B",
+                    label = stringResource(R.string.point_b),
                     onSubmit = { lat, lng -> viewModel.setPointB(GeoPoint(lat, lng)) },
                     onUseCurrentLocation = {
                         if (locationState.hasLocation) {
-                            viewModel.setPointB(GeoPoint(locationState.latitude, locationState.longitude, "Current Location"))
+                            viewModel.setPointB(GeoPoint(locationState.latitude, locationState.longitude, currentLocationLabel))
                         } else {
                             pendingLocationTarget = "B"
                             permissionLauncher.launch(arrayOf(
@@ -190,12 +220,12 @@ fun MeasureScreen(viewModel: MainViewModel) {
                 showSaveDialog = false
                 tagText = ""
             },
-            title = { Text("Save Measurement") },
+            title = { Text(stringResource(R.string.save_measurement_title)) },
             text = {
                 OutlinedTextField(
                     value = tagText,
                     onValueChange = { tagText = it },
-                    label = { Text("Name (optional)") },
+                    label = { Text(stringResource(R.string.name_optional)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -206,7 +236,7 @@ fun MeasureScreen(viewModel: MainViewModel) {
                     showSaveDialog = false
                     tagText = ""
                 }) {
-                    Text("Save")
+                    Text(stringResource(R.string.action_save))
                 }
             },
             dismissButton = {
@@ -214,7 +244,7 @@ fun MeasureScreen(viewModel: MainViewModel) {
                     showSaveDialog = false
                     tagText = ""
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

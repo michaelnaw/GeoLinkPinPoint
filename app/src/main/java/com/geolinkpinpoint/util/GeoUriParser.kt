@@ -1,5 +1,6 @@
 package com.geolinkpinpoint.util
 
+import android.util.Log
 import java.net.URLDecoder
 
 data class GeoPoint(
@@ -10,8 +11,16 @@ data class GeoPoint(
 
 object GeoUriParser {
 
+    private const val TAG = "GeoUriParser"
+
+    private fun isValidRange(lat: Double, lng: Double): Boolean =
+        lat in -90.0..90.0 && lng in -180.0..180.0
+
     fun parse(uri: String): GeoPoint? {
-        if (!uri.startsWith("geo:")) return null
+        if (!uri.startsWith("geo:")) {
+            Log.d(TAG, "Not a geo: URI: $uri")
+            return null
+        }
 
         val withoutScheme = uri.removePrefix("geo:")
         val mainAndQuery = withoutScheme.split("?", limit = 2)
@@ -19,11 +28,18 @@ object GeoUriParser {
         val queryPart = mainAndQuery.getOrNull(1)
 
         val coords = parseCoords(coordsPart)
-        if (coords == null) return null
+        if (coords == null) {
+            Log.w(TAG, "Failed to parse coordinates from: $coordsPart")
+            return null
+        }
 
         // If coords are 0,0 and there's a query param, try parsing from q=
         if (coords.first == 0.0 && coords.second == 0.0 && queryPart != null) {
-            return parseQueryParam(queryPart)
+            val result = parseQueryParam(queryPart)
+            if (result == null) {
+                Log.w(TAG, "Sentinel 0,0 URI but failed to parse q= param: $queryPart")
+            }
+            return result
         }
 
         // Try to get label from query param if available
@@ -39,7 +55,7 @@ object GeoUriParser {
         return try {
             val lat = components[0].trim().toDouble()
             val lng = components[1].trim().toDouble()
-            Pair(lat, lng)
+            if (isValidRange(lat, lng)) Pair(lat, lng) else null
         } catch (e: NumberFormatException) {
             null
         }
@@ -67,11 +83,9 @@ object GeoUriParser {
         val labelMatch = Regex("""^(-?[\d.]+),(-?[\d.]+)\((.+)\)$""").find(decoded)
         if (labelMatch != null) {
             return try {
-                GeoPoint(
-                    latitude = labelMatch.groupValues[1].toDouble(),
-                    longitude = labelMatch.groupValues[2].toDouble(),
-                    label = labelMatch.groupValues[3]
-                )
+                val lat = labelMatch.groupValues[1].toDouble()
+                val lng = labelMatch.groupValues[2].toDouble()
+                if (isValidRange(lat, lng)) GeoPoint(lat, lng, labelMatch.groupValues[3]) else null
             } catch (e: NumberFormatException) {
                 null
             }
@@ -80,10 +94,9 @@ object GeoUriParser {
         val coordMatch = Regex("""^(-?[\d.]+),(-?[\d.]+)$""").find(decoded)
         if (coordMatch != null) {
             return try {
-                GeoPoint(
-                    latitude = coordMatch.groupValues[1].toDouble(),
-                    longitude = coordMatch.groupValues[2].toDouble()
-                )
+                val lat = coordMatch.groupValues[1].toDouble()
+                val lng = coordMatch.groupValues[2].toDouble()
+                if (isValidRange(lat, lng)) GeoPoint(lat, lng) else null
             } catch (e: NumberFormatException) {
                 null
             }

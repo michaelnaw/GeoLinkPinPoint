@@ -18,8 +18,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.geolinkpinpoint.R
 
 @Composable
 fun CoordinateInput(
@@ -39,7 +41,7 @@ fun CoordinateInput(
             OutlinedTextField(
                 value = latText,
                 onValueChange = { latText = it },
-                label = { Text("Latitude") },
+                label = { Text(stringResource(R.string.latitude)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true,
                 modifier = Modifier.weight(1f)
@@ -47,7 +49,7 @@ fun CoordinateInput(
             OutlinedTextField(
                 value = lngText,
                 onValueChange = { lngText = it },
-                label = { Text("Longitude") },
+                label = { Text(stringResource(R.string.longitude)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true,
                 modifier = Modifier.weight(1f)
@@ -70,14 +72,14 @@ fun CoordinateInput(
                 },
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Set $label")
+                Text(stringResource(R.string.set_point, label))
             }
             if (onUseCurrentLocation != null) {
                 OutlinedButton(
                     onClick = onUseCurrentLocation,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Use Current")
+                    Text(stringResource(R.string.use_current))
                 }
             }
         }

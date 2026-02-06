@@ -1,4 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GeoLinkPinPoint</string>
+
+    <!-- Navigation -->
+    <string name="tab_measure">Measure</string>
+    <string name="tab_gps_compass">GPS/Compass</string>
+    <string name="tab_history">History</string>
+    <string name="action_export_csv">Export CSV</string>
+    <string name="action_clear_points">Clear Points</string>
+    <string name="export_measurements">Export Measurements</string>
+    <string name="export_failed">Export failed — no measurements or write error</string>
+
+    <!-- MeasureScreen -->
+    <string name="result_title">Result</string>
+    <string name="distance_value">Distance: %s</string>
+    <string name="bearing_value">Bearing: %.1f\u00B0 %s</string>
+    <string name="action_swap">Swap</string>
+    <string name="action_save">Save</string>
+    <string name="toggle_manual_input">Toggle manual input</string>
+    <string name="manual_input">Manual Input</string>
+    <string name="point_a">Point A</string>
+    <string name="point_b">Point B</string>
+    <string name="current_location">Current Location</string>
+    <string name="save_measurement_title">Save Measurement</string>
+    <string name="name_optional">Name (optional)</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- PointCard -->
+    <string name="point_not_set">Not set — share a location to this app</string>
+    <string name="coord_format">%.6f, %.6f</string>
+
+    <!-- CoordinateInput -->
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="set_point">Set %s</string>
+    <string name="use_current">Use Current</string>
+
+    <!-- GpsCompassScreen -->
+    <string name="compass_title">Compass</string>
+    <string name="compass_not_available">Compass sensor not available</string>
+    <string name="gps_title">GPS</string>
+    <string name="latitude_value">Latitude: %.6f</string>
+    <string name="longitude_value">Longitude: %.6f</string>
+    <string name="altitude_value">Altitude: %.1f m</string>
+    <string name="accuracy_value">Accuracy: %.1f m</string>
+    <string name="enable_location">Enable Location</string>
+    <string name="enable_location_hint">Tap to grant location permission and start GPS</string>
+
+    <!-- HistoryScreen -->
+    <string name="no_measurements_title">No measurements saved yet</string>
+    <string name="no_measurements_subtitle">Measure a distance and tap Save</string>
+    <string name="measurement_deleted">Measurement deleted</string>
+    <string name="measurement_default_name">Measurement #%d</string>
+    <string name="action_delete">Delete</string>
+
+    <!-- Permission -->
+    <string name="location_permission_required">Location permission required</string>
+
+    <!-- Instruction card -->
+    <string name="instruction_share_location">Share a location from WhatsApp or another map app to set Point A or B. You can also enter coordinates manually below.</string>
+
+    <!-- Compass accessibility -->
+    <string name="compass_heading_description">Compass heading %1$.0f degrees</string>
+    <string name="compass_heading_bearing_description">Compass heading %1$.0f degrees, target bearing %2$.0f degrees</string>
 </resources>

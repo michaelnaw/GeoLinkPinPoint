@@ -2,11 +2,12 @@ package com.geolinkpinpoint.ui
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.geolinkpinpoint.data.MeasurementDatabase
 import com.geolinkpinpoint.data.MeasurementEntity
+import com.geolinkpinpoint.data.MeasurementRepository
 import com.geolinkpinpoint.location.LocationHelper
 import com.geolinkpinpoint.location.LocationState
 import com.geolinkpinpoint.sensor.CompassHelper
@@ -30,10 +31,10 @@ data class MeasureState(
     val bearingDegrees: Double? = null
 )
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val database = MeasurementDatabase.getDatabase(application)
-    private val dao = database.measurementDao()
+class MainViewModel(
+    application: Application,
+    private val repository: MeasurementRepository
+) : AndroidViewModel(application) {
 
     val locationHelper = LocationHelper(application)
     val compassHelper = CompassHelper(application)
@@ -44,7 +45,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val locationState: StateFlow<LocationState> = locationHelper.locationState
     val compassState: StateFlow<CompassState> = compassHelper.compassState
 
-    val measurements = dao.getAllMeasurements()
+    val measurements = repository.getAllMeasurements()
 
     fun handleGeoUri(uri: String) {
         val point = GeoUriParser.parse(uri) ?: return
@@ -84,7 +85,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val bearing = state.bearingDegrees ?: return
 
         viewModelScope.launch {
-            dao.insert(
+            repository.insert(
                 MeasurementEntity(
                     pointALatitude = a.latitude,
                     pointALongitude = a.longitude,
@@ -113,7 +114,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun deleteFromHistory(measurement: MeasurementEntity) {
         viewModelScope.launch {
-            dao.delete(measurement)
+            repository.delete(measurement)
         }
     }
 
@@ -134,35 +135,41 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     suspend fun exportMeasurementsCsv(): Uri? {
-        val items = dao.getAllMeasurementsOnce()
-        if (items.isEmpty()) return null
+        return try {
+            val items = repository.getAllMeasurementsOnce()
+            if (items.isEmpty()) return null
 
-        val app = getApplication<Application>()
-        val file = File(app.cacheDir, "measurements.csv")
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
+            val app = getApplication<Application>()
+            val exportDir = File(app.cacheDir, "exports").apply { mkdirs() }
+            val file = File(exportDir, "measurements.csv")
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
 
-        file.bufferedWriter().use { writer ->
-            writer.write("Tag,PointA_Lat,PointA_Lng,PointA_Label,PointB_Lat,PointB_Lng,PointB_Label,Distance_m,Bearing_deg,Timestamp")
-            writer.newLine()
-            for (m in items) {
-                val fields = listOf(
-                    escapeCsv(m.tag ?: ""),
-                    m.pointALatitude.toString(),
-                    m.pointALongitude.toString(),
-                    escapeCsv(m.pointALabel ?: ""),
-                    m.pointBLatitude.toString(),
-                    m.pointBLongitude.toString(),
-                    escapeCsv(m.pointBLabel ?: ""),
-                    "%.2f".format(m.distanceMeters),
-                    "%.2f".format(m.bearingDegrees),
-                    dateFormat.format(Date(m.timestamp))
-                )
-                writer.write(fields.joinToString(","))
+            file.bufferedWriter().use { writer ->
+                writer.write("Tag,PointA_Lat,PointA_Lng,PointA_Label,PointB_Lat,PointB_Lng,PointB_Label,Distance_m,Bearing_deg,Timestamp")
                 writer.newLine()
+                for (m in items) {
+                    val fields = listOf(
+                        escapeCsv(m.tag ?: ""),
+                        m.pointALatitude.toString(),
+                        m.pointALongitude.toString(),
+                        escapeCsv(m.pointALabel ?: ""),
+                        m.pointBLatitude.toString(),
+                        m.pointBLongitude.toString(),
+                        escapeCsv(m.pointBLabel ?: ""),
+                        "%.2f".format(m.distanceMeters),
+                        "%.2f".format(m.bearingDegrees),
+                        dateFormat.format(Date(m.timestamp))
+                    )
+                    writer.write(fields.joinToString(","))
+                    writer.newLine()
+                }
             }
-        }
 
-        return FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
+            FileProvider.getUriForFile(app, "${app.packageName}.fileprovider", file)
+        } catch (e: Exception) {
+            Log.e("MainViewModel", "CSV export failed", e)
+            null
+        }
     }
 
     private fun escapeCsv(value: String): String {

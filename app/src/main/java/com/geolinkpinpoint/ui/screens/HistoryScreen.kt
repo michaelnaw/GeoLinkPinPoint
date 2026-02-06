@@ -29,8 +29,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.geolinkpinpoint.R
 import com.geolinkpinpoint.data.MeasurementEntity
 import com.geolinkpinpoint.ui.MainViewModel
 import com.geolinkpinpoint.util.GeoCalculations
@@ -47,6 +49,7 @@ fun HistoryScreen(
 ) {
     val measurements by viewModel.measurements.collectAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
+    val measurementDeletedMsg = stringResource(R.string.measurement_deleted)
 
     if (measurements.isEmpty()) {
         Box(
@@ -55,12 +58,12 @@ fun HistoryScreen(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "No measurements saved yet",
+                    text = stringResource(R.string.no_measurements_title),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Measure a distance and tap Save",
+                    text = stringResource(R.string.no_measurements_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -86,7 +89,7 @@ fun HistoryScreen(
                     onDelete = {
                         viewModel.deleteFromHistory(measurement)
                         scope.launch {
-                            snackbarHostState.showSnackbar("Measurement deleted")
+                            snackbarHostState.showSnackbar(measurementDeletedMsg)
                         }
                     }
                 )
@@ -132,7 +135,7 @@ private fun MeasurementItem(
             ) {
                 Icon(
                     Icons.Default.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(R.string.action_delete),
                     tint = MaterialTheme.colorScheme.onError
                 )
             }
@@ -148,7 +151,7 @@ private fun MeasurementItem(
             )
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
-                val title = measurement.tag ?: "Measurement #${measurement.id}"
+                val title = measurement.tag ?: stringResource(R.string.measurement_default_name, measurement.id)
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,

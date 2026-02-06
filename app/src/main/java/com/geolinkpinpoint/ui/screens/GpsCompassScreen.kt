@@ -26,18 +26,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.geolinkpinpoint.R
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.rememberCoroutineScope
 import com.geolinkpinpoint.ui.MainViewModel
 import com.geolinkpinpoint.ui.components.CompassView
 import com.geolinkpinpoint.util.GeoCalculations
+import kotlinx.coroutines.launch
 
 @Composable
-fun GpsCompassScreen(viewModel: MainViewModel) {
+fun GpsCompassScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostState) {
     val locationState by viewModel.locationState.collectAsState()
     val compassState by viewModel.compassState.collectAsState()
     val measureState by viewModel.measureState.collectAsState()
     var permissionGranted by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val permissionDeniedMsg = stringResource(R.string.location_permission_required)
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -45,6 +52,10 @@ fun GpsCompassScreen(viewModel: MainViewModel) {
         permissionGranted = permissions.values.any { it }
         if (permissionGranted) {
             viewModel.startLocationUpdates()
+        } else {
+            scope.launch {
+                snackbarHostState.showSnackbar(permissionDeniedMsg)
+            }
         }
     }
 
@@ -65,7 +76,7 @@ fun GpsCompassScreen(viewModel: MainViewModel) {
     ) {
         // Compass
         Text(
-            text = "Compass",
+            text = stringResource(R.string.compass_title),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
@@ -89,7 +100,7 @@ fun GpsCompassScreen(viewModel: MainViewModel) {
 
         if (!compassState.isAvailable) {
             Text(
-                text = "Compass sensor not available",
+                text = stringResource(R.string.compass_not_available),
                 color = MaterialTheme.colorScheme.error
             )
         }
@@ -98,7 +109,7 @@ fun GpsCompassScreen(viewModel: MainViewModel) {
 
         // GPS info
         Text(
-            text = "GPS",
+            text = stringResource(R.string.gps_title),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
@@ -111,10 +122,10 @@ fun GpsCompassScreen(viewModel: MainViewModel) {
                 )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Latitude: %.6f".format(locationState.latitude))
-                    Text("Longitude: %.6f".format(locationState.longitude))
-                    Text("Altitude: %.1f m".format(locationState.altitude))
-                    Text("Accuracy: %.1f m".format(locationState.accuracy))
+                    Text(stringResource(R.string.latitude_value).format(locationState.latitude))
+                    Text(stringResource(R.string.longitude_value).format(locationState.longitude))
+                    Text(stringResource(R.string.altitude_value).format(locationState.altitude))
+                    Text(stringResource(R.string.accuracy_value).format(locationState.accuracy))
                 }
             }
         } else {
@@ -128,10 +139,10 @@ fun GpsCompassScreen(viewModel: MainViewModel) {
                     )
                 }
             ) {
-                Text("Enable Location")
+                Text(stringResource(R.string.enable_location))
             }
             Text(
-                text = "Tap to grant location permission and start GPS",
+                text = stringResource(R.string.enable_location_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

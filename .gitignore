@@ -21,7 +21,12 @@ gradle-app.setting
 
 # Kotlin
 *.class
+*.kotlin_module
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Claude
+CLAUDE.md

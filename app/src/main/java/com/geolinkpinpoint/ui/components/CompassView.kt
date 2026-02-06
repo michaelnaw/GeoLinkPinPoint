@@ -18,7 +18,11 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.geolinkpinpoint.R
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -49,7 +53,17 @@ fun CompassView(
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
 
-    Canvas(modifier = modifier.size(240.dp)) {
+    val compassDescription = if (bearingToTarget != null) {
+        stringResource(R.string.compass_heading_bearing_description, azimuth, bearingToTarget)
+    } else {
+        stringResource(R.string.compass_heading_description, azimuth)
+    }
+
+    Canvas(
+        modifier = modifier
+            .size(240.dp)
+            .semantics { contentDescription = compassDescription }
+    ) {
         val centerX = size.width / 2
         val centerY = size.height / 2
         val radius = size.minDimension / 2 * 0.85f
