@@ -1,0 +1,4 @@
+What's new in v1.1:
+- New app icon with adaptive and round icon support
+- Plus/minus (±) toggle button on coordinate input fields
+- Privacy policy page
