@@ -30,3 +30,8 @@ desktop.ini
 
 # Claude
 CLAUDE.md
+
+# Signing
+keystore.properties
+*.jks
+*.keystore
