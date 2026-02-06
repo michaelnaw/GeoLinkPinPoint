@@ -1,0 +1,19 @@
+GeoLinkPinPoint is a field utility for capturing GPS coordinates from WhatsApp shared locations and calculating distance and bearing between two points.
+
+<b>How it works</b>
+Tap a shared location in WhatsApp (or any app that uses geo: links) and choose GeoLinkPinPoint. The coordinates auto-fill as Point A. Repeat with a second location for Point B. Distance and bearing are calculated instantly.
+
+<b>Key features</b>
+- <b>WhatsApp integration</b> — Registers as a geo: URI handler so shared locations open directly in the app
+- <b>Distance and bearing</b> — Haversine distance (meters/km) and forward bearing (degrees + cardinal direction)
+- <b>Manual coordinate input</b> — Enter lat/lng by hand or use "Use Current Location" with GPS
+- <b>Live GPS display</b> — Shows current latitude, longitude, altitude, and accuracy
+- <b>Compass</b> — Smooth sensor-fused compass with bearing-to-target indicator
+- <b>Measurement history</b> — Save measurements to a local database, tap to reload, swipe to delete
+- <b>CSV export</b> — Share your measurement history as a CSV file via the share sheet
+
+<b>Privacy first</b>
+All data stays on your device. No accounts, no analytics, no ads, no cloud sync. Your location data is never sent anywhere.
+
+<b>Requirements</b>
+Android 8.0 or newer. Location permission required for GPS features.

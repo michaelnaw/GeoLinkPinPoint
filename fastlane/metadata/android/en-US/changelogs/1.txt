@@ -1,0 +1,8 @@
+Initial release:
+- Capture coordinates from WhatsApp shared locations (geo: URI handler)
+- Calculate distance and bearing between two points
+- Manual coordinate input and GPS-based current location
+- Live GPS display with altitude and accuracy
+- Compass with bearing-to-target indicator
+- Save measurements to local history
+- Export measurement history as CSV

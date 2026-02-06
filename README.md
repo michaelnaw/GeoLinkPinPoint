@@ -14,7 +14,11 @@ Native Android field utility for capturing GPS coordinates from WhatsApp shared 
 
 ## Screenshots
 
-> Screenshots coming soon. See the `screenshots/` directory.
+| Measure | GPS & Compass | History |
+|---------|---------------|---------|
+| ![Measure](screenshots/measure.png) | ![GPS & Compass](screenshots/gps-compass.png) | ![History](screenshots/history.png) |
+
+> To add screenshots, capture them with `adb shell screencap` and place in the `screenshots/` directory.
 
 ## Requirements
 
