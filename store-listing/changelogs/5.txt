@@ -1,0 +1,4 @@
+What's new in v1.3:
+- Updated target SDK to Android 16 (API 36)
+- Updated Gradle and all dependencies to latest versions
+- Resolved Android lint warnings for outdated libraries
