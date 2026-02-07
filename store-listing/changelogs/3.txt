@@ -1,0 +1,5 @@
+What's new in v1.2:
+- Fixed potential crash when location permission is revoked while app is in use
+- Disabled cloud backup to match privacy policy (data stays on device only)
+- Coordinate input now validates lat/lng range before accepting
+- CSV export hardened against formula injection in labels
