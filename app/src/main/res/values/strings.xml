@@ -61,6 +61,8 @@
     <!-- Location acquisition -->
     <string name="acquiring_location">Acquiring location\u2026</string>
     <string name="location_timeout">Could not get location — check GPS settings and try again</string>
+    <string name="gps_location_timeout">Could not acquire location. Make sure GPS is enabled and you are outdoors.</string>
+    <string name="action_retry">Retry</string>
 
     <!-- Instruction card -->
     <string name="instruction_share_location">Share a location from WhatsApp or another map app to set Point A or B. You can also enter coordinates manually below.</string>

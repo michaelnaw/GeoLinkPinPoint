@@ -21,8 +21,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -42,6 +47,7 @@ fun GpsCompassScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostSt
     val compassState by viewModel.compassState.collectAsState()
     val measureState by viewModel.measureState.collectAsState()
     val scope = rememberCoroutineScope()
+    var hasTimedOut by remember { mutableStateOf(false) }
     val permissionDeniedMsg = stringResource(R.string.location_permission_required)
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -66,6 +72,22 @@ fun GpsCompassScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostSt
     DisposableEffect(Unit) {
         onDispose {
             viewModel.stopLocationUpdates()
+        }
+    }
+
+    // 15-second timeout while acquiring
+    LaunchedEffect(locationState.isAcquiringLocation) {
+        if (locationState.isAcquiringLocation) {
+            delay(15_000L)
+            hasTimedOut = true
+            viewModel.stopLocationUpdates()
+        }
+    }
+
+    // Clear timeout if location arrives (race condition safety)
+    LaunchedEffect(locationState.hasLocation) {
+        if (locationState.hasLocation) {
+            hasTimedOut = false
         }
     }
 
@@ -130,6 +152,32 @@ fun GpsCompassScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostSt
                         Text(stringResource(R.string.longitude_value).format(locationState.longitude))
                         Text(stringResource(R.string.altitude_value).format(locationState.altitude))
                         Text(stringResource(R.string.accuracy_value).format(locationState.accuracy))
+                    }
+                }
+            }
+            hasTimedOut -> {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.gps_location_timeout),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                        Button(onClick = {
+                            hasTimedOut = false
+                            viewModel.startLocationUpdates()
+                        }) {
+                            Text(stringResource(R.string.action_retry))
+                        }
                     }
                 }
             }
