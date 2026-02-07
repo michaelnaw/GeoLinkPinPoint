@@ -72,40 +72,6 @@ adb shell am start -a android.intent.action.VIEW -d "geo:32.0853,34.7818"
 adb shell am start -a android.intent.action.VIEW -d "'geo:0,0?q=32.7940,34.9896(Haifa)'"
 ```
 
-## Project Structure
-
-```
-app/src/main/java/com/geolinkpinpoint/
-├── MainActivity.kt                 # Single activity, geo: intent handler
-├── data/
-│   ├── MeasurementDatabase.kt      # Room database (v2, with migration)
-│   ├── MeasurementDao.kt           # Data access object
-│   ├── MeasurementEntity.kt        # Database entity
-│   └── MeasurementRepository.kt    # Repository wrapping DAO
-├── location/
-│   └── LocationHelper.kt           # FusedLocationProviderClient wrapper
-├── sensor/
-│   └── CompassHelper.kt            # Accelerometer + magnetometer fusion
-├── ui/
-│   ├── MainViewModel.kt            # Shared ViewModel (AndroidViewModel)
-│   ├── MainViewModelFactory.kt     # ViewModelProvider.Factory
-│   ├── components/
-│   │   ├── CompassView.kt          # Custom compass Canvas drawing
-│   │   ├── CoordinateInput.kt      # Lat/lng input fields
-│   │   └── PointCard.kt            # Point A/B display card
-│   ├── navigation/
-│   │   └── AppNavigation.kt        # 3-tab bottom navigation
-│   ├── screens/
-│   │   ├── MeasureScreen.kt        # Main measurement screen
-│   │   ├── GpsCompassScreen.kt     # GPS + compass display
-│   │   └── HistoryScreen.kt        # Saved measurements list
-│   └── theme/
-│       └── Theme.kt                # Material 3 theme
-└── util/
-    ├── GeoUriParser.kt             # geo: URI parsing with sentinel handling
-    └── GeoCalculations.kt          # Haversine distance, bearing, formatting
-```
-
 ## Tech Stack
 
 | Component | Version |

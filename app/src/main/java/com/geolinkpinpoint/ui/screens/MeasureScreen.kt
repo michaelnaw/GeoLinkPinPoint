@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.delay
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +64,7 @@ fun MeasureScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostState
     val scope = rememberCoroutineScope()
     val currentLocationLabel = stringResource(R.string.current_location)
     val permissionDeniedMsg = stringResource(R.string.location_permission_required)
+    val locationTimeoutMsg = stringResource(R.string.location_timeout)
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -86,6 +88,15 @@ fun MeasureScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostState
             }
             pendingLocationTarget = null
             viewModel.stopLocationUpdates()
+        }
+    }
+
+    LaunchedEffect(pendingLocationTarget) {
+        if (pendingLocationTarget != null) {
+            delay(15_000L)
+            pendingLocationTarget = null
+            viewModel.stopLocationUpdates()
+            snackbarHostState.showSnackbar(locationTimeoutMsg)
         }
     }
 
@@ -202,7 +213,8 @@ fun MeasureScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostState
                             ))
                         }
                     },
-                    snackbarHostState = snackbarHostState
+                    snackbarHostState = snackbarHostState,
+                    isLoading = pendingLocationTarget == "A"
                 )
                 CoordinateInput(
                     label = stringResource(R.string.point_b),
@@ -218,7 +230,8 @@ fun MeasureScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostState
                             ))
                         }
                     },
-                    snackbarHostState = snackbarHostState
+                    snackbarHostState = snackbarHostState,
+                    isLoading = pendingLocationTarget == "B"
                 )
             }
         }

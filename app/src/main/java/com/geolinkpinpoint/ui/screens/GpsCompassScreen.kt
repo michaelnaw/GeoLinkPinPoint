@@ -10,20 +10,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -42,15 +41,13 @@ fun GpsCompassScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostSt
     val locationState by viewModel.locationState.collectAsState()
     val compassState by viewModel.compassState.collectAsState()
     val measureState by viewModel.measureState.collectAsState()
-    var permissionGranted by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val permissionDeniedMsg = stringResource(R.string.location_permission_required)
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        permissionGranted = permissions.values.any { it }
-        if (permissionGranted) {
+        if (permissions.values.any { it }) {
             viewModel.startLocationUpdates()
         } else {
             scope.launch {
@@ -120,38 +117,48 @@ fun GpsCompassScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostSt
             fontWeight = FontWeight.Bold
         )
 
-        if (locationState.hasLocation) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.latitude_value).format(locationState.latitude))
-                    Text(stringResource(R.string.longitude_value).format(locationState.longitude))
-                    Text(stringResource(R.string.altitude_value).format(locationState.altitude))
-                    Text(stringResource(R.string.accuracy_value).format(locationState.accuracy))
-                }
-            }
-        } else {
-            Button(
-                onClick = {
-                    permissionLauncher.launch(
-                        arrayOf(
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                        )
+        when {
+            locationState.hasLocation -> {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(stringResource(R.string.latitude_value).format(locationState.latitude))
+                        Text(stringResource(R.string.longitude_value).format(locationState.longitude))
+                        Text(stringResource(R.string.altitude_value).format(locationState.altitude))
+                        Text(stringResource(R.string.accuracy_value).format(locationState.accuracy))
+                    }
                 }
-            ) {
-                Text(stringResource(R.string.enable_location))
             }
-            Text(
-                text = stringResource(R.string.enable_location_hint),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            locationState.isAcquiringLocation -> {
+                CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                Text(
+                    text = stringResource(R.string.acquiring_location),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            else -> {
+                Button(
+                    onClick = {
+                        permissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            )
+                        )
+                    }
+                ) {
+                    Text(stringResource(R.string.enable_location))
+                }
+                Text(
+                    text = stringResource(R.string.enable_location_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

@@ -22,7 +22,8 @@ data class LocationState(
     val longitude: Double = 0.0,
     val altitude: Double = 0.0,
     val accuracy: Float = 0f,
-    val hasLocation: Boolean = false
+    val hasLocation: Boolean = false,
+    val isAcquiringLocation: Boolean = false
 )
 
 class LocationHelper(context: Context) : DefaultLifecycleObserver {
@@ -52,7 +53,8 @@ class LocationHelper(context: Context) : DefaultLifecycleObserver {
                     longitude = location.longitude,
                     altitude = location.altitude,
                     accuracy = location.accuracy,
-                    hasLocation = true
+                    hasLocation = true,
+                    isAcquiringLocation = false
                 )
             }
         }
@@ -67,6 +69,9 @@ class LocationHelper(context: Context) : DefaultLifecycleObserver {
                 locationCallback,
                 Looper.getMainLooper()
             )
+            if (!_locationState.value.hasLocation) {
+                _locationState.value = _locationState.value.copy(isAcquiringLocation = true)
+            }
         } catch (e: SecurityException) {
             updatesRequested = false
             _locationState.value = LocationState()
