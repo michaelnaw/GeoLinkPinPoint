@@ -69,6 +69,7 @@ class LocationHelper(context: Context) : DefaultLifecycleObserver {
             )
         } catch (e: SecurityException) {
             updatesRequested = false
+            _locationState.value = LocationState()
             Log.w(TAG, "Location permission revoked, cannot start updates", e)
         }
     }
@@ -76,6 +77,7 @@ class LocationHelper(context: Context) : DefaultLifecycleObserver {
     fun stopUpdates() {
         updatesRequested = false
         fusedClient.removeLocationUpdates(locationCallback)
+        _locationState.value = LocationState()
     }
 
     fun bindToLifecycle(lifecycle: Lifecycle) {
@@ -96,6 +98,7 @@ class LocationHelper(context: Context) : DefaultLifecycleObserver {
                 )
             } catch (e: SecurityException) {
                 updatesRequested = false
+                _locationState.value = LocationState()
                 Log.w(TAG, "Location permission revoked, cannot resume updates", e)
             }
         }

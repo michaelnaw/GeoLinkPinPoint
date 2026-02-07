@@ -15,7 +15,7 @@ object CsvUtils {
         return when {
             trimmed.isNotEmpty() && trimmed[0] in charArrayOf('=', '+', '-', '@') ->
                 "\"'$escaped\""
-            escaped.contains(",") || escaped.contains("\"") || escaped.contains("\n") || escaped.contains("\t") ->
+            escaped.contains(",") || escaped.contains("\"") || escaped.contains("\n") || escaped.contains("\r") || escaped.contains("\t") ->
                 "\"$escaped\""
             else -> escaped
         }

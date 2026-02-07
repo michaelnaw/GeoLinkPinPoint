@@ -40,6 +40,11 @@ class CsvUtilsTest {
     }
 
     @Test
+    fun `value containing carriage return is quoted`() {
+        assertEquals("\"Line1\rLine2\"", CsvUtils.escapeCsv("Line1\rLine2"))
+    }
+
+    @Test
     fun `value containing double quote is escaped and quoted`() {
         assertEquals("\"She said \"\"hi\"\"\"", CsvUtils.escapeCsv("She said \"hi\""))
     }
