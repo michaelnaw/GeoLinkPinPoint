@@ -29,8 +29,8 @@ import kotlin.math.sin
 @Composable
 fun CompassView(
     azimuth: Float,
-    bearingToTarget: Float? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    bearingToTarget: Float? = null
 ) {
     var previousTarget by remember { mutableFloatStateOf(0f) }
     val wrappedAzimuth = remember(azimuth) {

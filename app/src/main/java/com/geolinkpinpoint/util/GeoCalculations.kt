@@ -1,5 +1,6 @@
 package com.geolinkpinpoint.util
 
+import java.util.Locale
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -50,9 +51,9 @@ object GeoCalculations {
 
     fun formatDistance(meters: Double): String {
         return if (meters >= 1000) {
-            String.format("%.2f km", meters / 1000)
+            String.format(Locale.US, "%.2f km", meters / 1000)
         } else {
-            String.format("%.1f m", meters)
+            String.format(Locale.US, "%.1f m", meters)
         }
     }
 }
