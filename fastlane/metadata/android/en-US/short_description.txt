@@ -1,1 +1,1 @@
-Capture GPS coordinates from shared locations and measure distances.
+Capture GPS coordinates from shared locations and calculate distance & bearing.
