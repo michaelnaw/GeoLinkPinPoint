@@ -3,6 +3,7 @@ package com.geolinkpinpoint.location
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -25,6 +26,10 @@ data class LocationState(
 )
 
 class LocationHelper(context: Context) : DefaultLifecycleObserver {
+
+    private companion object {
+        private const val TAG = "LocationHelper"
+    }
 
     private val fusedClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
@@ -56,11 +61,16 @@ class LocationHelper(context: Context) : DefaultLifecycleObserver {
     @SuppressLint("MissingPermission")
     fun startUpdates() {
         updatesRequested = true
-        fusedClient.requestLocationUpdates(
-            locationRequest,
-            locationCallback,
-            Looper.getMainLooper()
-        )
+        try {
+            fusedClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+        } catch (e: SecurityException) {
+            updatesRequested = false
+            Log.w(TAG, "Location permission revoked, cannot start updates", e)
+        }
     }
 
     fun stopUpdates() {
@@ -78,11 +88,16 @@ class LocationHelper(context: Context) : DefaultLifecycleObserver {
     @SuppressLint("MissingPermission")
     override fun onResume(owner: LifecycleOwner) {
         if (updatesRequested) {
-            fusedClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
-            )
+            try {
+                fusedClient.requestLocationUpdates(
+                    locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper()
+                )
+            } catch (e: SecurityException) {
+                updatesRequested = false
+                Log.w(TAG, "Location permission revoked, cannot resume updates", e)
+            }
         }
     }
 

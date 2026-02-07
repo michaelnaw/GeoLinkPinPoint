@@ -36,6 +36,7 @@
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="set_point">Set %s</string>
+    <string name="coordinates_out_of_range">Coordinates out of range (lat: -90 to 90, lng: -180 to 180)</string>
     <string name="use_current">Use Current</string>
 
     <!-- GpsCompassScreen -->

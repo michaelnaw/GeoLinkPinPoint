@@ -193,7 +193,8 @@ fun MeasureScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostState
                                 Manifest.permission.ACCESS_COARSE_LOCATION
                             ))
                         }
-                    }
+                    },
+                    snackbarHostState = snackbarHostState
                 )
                 CoordinateInput(
                     label = stringResource(R.string.point_b),
@@ -208,7 +209,8 @@ fun MeasureScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostState
                                 Manifest.permission.ACCESS_COARSE_LOCATION
                             ))
                         }
-                    }
+                    },
+                    snackbarHostState = snackbarHostState
                 )
             }
         }

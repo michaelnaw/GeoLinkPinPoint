@@ -173,10 +173,13 @@ class MainViewModel(
     }
 
     private fun escapeCsv(value: String): String {
-        return if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
-            "\"${value.replace("\"", "\"\"")}\""
-        } else {
-            value
+        val escaped = value.replace("\"", "\"\"")
+        return when {
+            value.isNotEmpty() && value[0] in charArrayOf('=', '+', '-', '@') ->
+                "\"'$escaped\""
+            value.contains(",") || value.contains("\"") || value.contains("\n") ->
+                "\"$escaped\""
+            else -> value
         }
     }
 

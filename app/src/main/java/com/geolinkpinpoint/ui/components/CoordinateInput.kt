@@ -13,27 +13,33 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.geolinkpinpoint.R
+import kotlinx.coroutines.launch
 
 @Composable
 fun CoordinateInput(
     label: String,
     onSubmit: (Double, Double) -> Unit,
     onUseCurrentLocation: (() -> Unit)?,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
     var latText by remember { mutableStateOf("") }
     var lngText by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val outOfRangeMsg = stringResource(R.string.coordinates_out_of_range)
 
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
@@ -87,9 +93,13 @@ fun CoordinateInput(
                     val lat = latText.toDoubleOrNull()
                     val lng = lngText.toDoubleOrNull()
                     if (lat != null && lng != null) {
-                        onSubmit(lat, lng)
-                        latText = ""
-                        lngText = ""
+                        if (lat in -90.0..90.0 && lng in -180.0..180.0) {
+                            onSubmit(lat, lng)
+                            latText = ""
+                            lngText = ""
+                        } else {
+                            scope.launch { snackbarHostState.showSnackbar(outOfRangeMsg) }
+                        }
                     }
                 },
                 modifier = Modifier.weight(1f)
