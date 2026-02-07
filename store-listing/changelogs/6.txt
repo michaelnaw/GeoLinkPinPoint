@@ -1,0 +1,2 @@
+- Fixed GPS/Compass tab getting stuck in endless "Acquiring location..." state
+- Added 15-second timeout with error message and Retry button when GPS signal is unavailable
