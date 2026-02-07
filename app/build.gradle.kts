@@ -26,6 +26,10 @@ android {
         versionCode = 3
         versionName = "1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            debugSymbolLevel = "FULL"
+        }
     }
 
     signingConfigs {
