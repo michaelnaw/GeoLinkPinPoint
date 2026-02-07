@@ -22,7 +22,7 @@ Native Android field utility for capturing GPS coordinates from WhatsApp shared 
 
 - Android 8.0+ (API 26)
 - JDK 17
-- Android SDK 35
+- Android SDK 36
 
 ## Build
 
@@ -79,10 +79,10 @@ adb shell am start -a android.intent.action.VIEW -d "'geo:0,0?q=32.7940,34.9896(
 | Kotlin | 2.3.10 |
 | Jetpack Compose BOM | 2025.01.01 |
 | Room (KSP) | 2.8.4 |
-| Navigation Compose | 2.8.5 |
+| Navigation Compose | 2.9.7 |
 | Play Services Location | 21.3.0 |
 | Min SDK | 26 (Android 8.0) |
-| Target SDK | 35 |
+| Target SDK | 36 |
 | JVM Target | 17 |
 
 ## License
