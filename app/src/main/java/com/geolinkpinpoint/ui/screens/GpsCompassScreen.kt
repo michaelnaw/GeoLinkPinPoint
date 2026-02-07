@@ -66,6 +66,12 @@ fun GpsCompassScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostSt
         }
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.stopLocationUpdates()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

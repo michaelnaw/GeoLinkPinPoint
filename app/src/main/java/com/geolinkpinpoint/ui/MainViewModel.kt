@@ -12,6 +12,7 @@ import com.geolinkpinpoint.location.LocationHelper
 import com.geolinkpinpoint.location.LocationState
 import com.geolinkpinpoint.sensor.CompassHelper
 import com.geolinkpinpoint.sensor.CompassState
+import com.geolinkpinpoint.util.CsvUtils
 import com.geolinkpinpoint.util.GeoCalculations
 import com.geolinkpinpoint.util.GeoPoint
 import com.geolinkpinpoint.util.GeoUriParser
@@ -149,13 +150,13 @@ class MainViewModel(
                 writer.newLine()
                 for (m in items) {
                     val fields = listOf(
-                        escapeCsv(m.tag ?: ""),
+                        CsvUtils.escapeCsv(m.tag ?: ""),
                         m.pointALatitude.toString(),
                         m.pointALongitude.toString(),
-                        escapeCsv(m.pointALabel ?: ""),
+                        CsvUtils.escapeCsv(m.pointALabel ?: ""),
                         m.pointBLatitude.toString(),
                         m.pointBLongitude.toString(),
-                        escapeCsv(m.pointBLabel ?: ""),
+                        CsvUtils.escapeCsv(m.pointBLabel ?: ""),
                         String.format(Locale.US, "%.2f", m.distanceMeters),
                         String.format(Locale.US, "%.2f", m.bearingDegrees),
                         dateFormat.format(Date(m.timestamp))
@@ -169,17 +170,6 @@ class MainViewModel(
         } catch (e: Exception) {
             Log.e("MainViewModel", "CSV export failed", e)
             null
-        }
-    }
-
-    private fun escapeCsv(value: String): String {
-        val escaped = value.replace("\"", "\"\"")
-        return when {
-            value.isNotEmpty() && value[0] in charArrayOf('=', '+', '-', '@') ->
-                "\"'$escaped\""
-            value.contains(",") || value.contains("\"") || value.contains("\n") ->
-                "\"$escaped\""
-            else -> value
         }
     }
 

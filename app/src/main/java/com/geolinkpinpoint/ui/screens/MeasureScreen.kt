@@ -30,6 +30,7 @@ import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.collectAsState
@@ -84,6 +85,13 @@ fun MeasureScreen(viewModel: MainViewModel, snackbarHostState: SnackbarHostState
                 "B" -> viewModel.setPointB(point)
             }
             pendingLocationTarget = null
+            viewModel.stopLocationUpdates()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.stopLocationUpdates()
         }
     }
 
