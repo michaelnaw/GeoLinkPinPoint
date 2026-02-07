@@ -16,9 +16,7 @@ Native Android field utility for capturing GPS coordinates from WhatsApp shared 
 
 | Measure | GPS & Compass | History |
 |---------|---------------|---------|
-| ![Measure](screenshots/measure.png) | ![GPS & Compass](screenshots/gps-compass.png) | ![History](screenshots/history.png) |
-
-> To add screenshots, capture them with `adb shell screencap` and place in the `screenshots/` directory.
+| ![Measure](screenshots/Screenshot_20260206_235553_GeoLinkPinPoint.jpg) | ![GPS & Compass](screenshots/Screenshot_20260206_235754_GeoLinkPinPoint.jpg) | ![History](screenshots/Screenshot_20260206_235604_GeoLinkPinPoint.jpg) |
 
 ## Requirements
 
@@ -112,9 +110,9 @@ app/src/main/java/com/geolinkpinpoint/
 
 | Component | Version |
 |-----------|---------|
-| Kotlin | 2.1.0 |
+| Kotlin | 2.3.10 |
 | Jetpack Compose BOM | 2025.01.01 |
-| Room (KSP) | 2.7.0 |
+| Room (KSP) | 2.8.4 |
 | Navigation Compose | 2.8.5 |
 | Play Services Location | 21.3.0 |
 | Min SDK | 26 (Android 8.0) |
